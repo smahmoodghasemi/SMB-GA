@@ -1,0 +1,72 @@
+#Genetic Algorithm
+import random
+
+# Function to optimize
+def fitness_function(x):
+    return -x**2 + 4*x
+
+# Genetic algorithm parameters
+population_size = 100
+mutation_rate = 0.01
+generations = 50
+
+# Create an individual with a random value within the given range
+def create_individual():
+    return random.uniform(-10, 10)
+
+# Create an initial population of individuals
+def create_population():
+    return [create_individual() for _ in range(population_size)]
+
+# Calculate fitness for each individual in the population
+def calculate_fitness(population):
+    return [fitness_function(individual) for individual in population]
+
+# Select two individuals from the population based on their fitness
+def select_parents(population, fitness_values):
+    idx1 = random.choices(range(len(population)), weights=fitness_values)[0]
+    idx2 = random.choices(range(len(population)), weights=fitness_values)[0]
+    return population[idx1], population[idx2]
+
+# Perform crossover between two parents to create a child
+def crossover(parent1, parent2):
+    # Simple average crossover
+    return (parent1 + parent2) / 2.0
+
+# Perform mutation on an individual
+def mutate(individual):
+    if random.random() < mutation_rate:
+        # Add a small random value to the individual
+        return individual + random.uniform(-1, 1)
+    return individual
+
+# The main genetic algorithm function
+def genetic_algorithm():
+    population = create_population()
+    for generation in range(generations):
+        fitness_values = calculate_fitness(population)
+
+        # Find the best individual in this generation
+        best_fitness = max(fitness_values)
+        best_individual = population[fitness_values.index(best_fitness)]
+
+        print(f"Generation {generation}: Best fitness = {best_fitness}, Best individual = {best_individual}")
+
+        # Select parents and create the next generation
+        next_population = []
+        for _ in range(population_size // 2):
+            parent1, parent2 = select_parents(population, fitness_values)
+            child = crossover(parent1, parent2)
+            child = mutate(child)
+            next_population.append(child)
+
+        population = next_population
+
+    return population
+
+if __name__ == "__main__":
+    final_population = genetic_algorithm()
+    best_fitness = max(calculate_fitness(final_population))
+    best_individual = final_population[calculate_fitness(final_population).index(best_fitness)]
+    print("\nFinal Result:")
+    print(f"Best fitness = {best_fitness}, Best individual = {best_individual}")
